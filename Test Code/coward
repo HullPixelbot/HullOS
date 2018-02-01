@@ -1,0 +1,5 @@
+do
+    if %dist < 10
+        move -10
+    endif
+forever

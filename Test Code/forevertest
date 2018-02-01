@@ -1,0 +1,6 @@
+do
+    blue
+    delay 5
+    magenta
+    delay 5
+forever

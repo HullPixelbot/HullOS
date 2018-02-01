@@ -1,0 +1,7 @@
+do
+    if %dist < 10
+        yellow
+    else
+       green
+    endif
+forever

@@ -1,0 +1,8 @@
+set c=0
+do
+    colour 0,255,255
+    delay 5
+    colour 255,0,0
+    delay 5
+    set c = c + 1
+until c > 4
