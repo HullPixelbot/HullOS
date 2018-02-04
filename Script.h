@@ -1872,10 +1872,6 @@ int decodeScriptChar(char b, void(*output) (byte))
 	if (b == '\n')
 		b = STATEMENT_TERMINATOR;
 
-	// convert upper case characters into lower case
-	if ((b >= 'A') && (b <= 'Z'))
-		b = b + 32;
-
 	if (scriptInputBufferPos == SCRIPT_INPUT_BUFFER_LENGTH)
 		return ERROR_SCRIPT_INPUT_BUFFER_OVERFLOW;
 

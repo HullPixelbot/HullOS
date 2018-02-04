@@ -2558,7 +2558,7 @@ void remoteManagement()
 	}
 }
 
-const String version = "Version R1.0";
+const String version = "Version R1.1";
 
 // IV - information display version
 
