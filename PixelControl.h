@@ -30,30 +30,30 @@ bool forceLightUpdate;
 
 typedef enum lightStates
 {
-  lightStateOff,
-  lightStateColourBounce,
-  lightStateFlickerFixed,
-  lightStateFlickerRandom,
-  lightStateSteady
+	lightStateOff,
+	lightStateColourBounce,
+	lightStateFlickerFixed,
+	lightStateFlickerRandom,
+	lightStateSteady
 };
 
 struct Light {
-  byte r, rMax, rMin;
-  int8_t rUpdate;
-  byte g, gMax, gMin;
-  int8_t gUpdate;
-  byte b, bMax, bMin;
-  int8_t bUpdate;
-  byte colourSpeed;
-  byte flickerBrightness;
-  int8_t flickerUpdate;
-  byte flickerSpeed;
-  byte flickerMin;
-  byte flickerMax;
-  int pos, posMax, posMin;
-  int8_t moveDist;
-  byte moveSpeed;
-  lightStates lightState;
+	byte r, rMax, rMin;
+	int8_t rUpdate;
+	byte g, gMax, gMin;
+	int8_t gUpdate;
+	byte b, bMax, bMin;
+	int8_t bUpdate;
+	byte colourSpeed;
+	byte flickerBrightness;
+	int8_t flickerUpdate;
+	byte flickerSpeed;
+	byte flickerMin;
+	byte flickerMax;
+	int pos, posMax, posMin;
+	int8_t moveDist;
+	byte moveSpeed;
+	lightStates lightState;
 } lights[NO_OF_LIGHTS];
 
 int tickCount;
@@ -64,549 +64,555 @@ byte oldr = 0, oldg = 0, oldb = 0;
 
 void resetOldFlickerValues()
 {
-  oldr = 0;
-  oldb = 0;
-  oldg = 0;
+	oldr = 0;
+	oldb = 0;
+	oldg = 0;
 }
 
 void setLightColor(byte r, byte g, byte b)
 {
-  byte i;
-  for (i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    lights[i].pos = (int)((float)i / NO_OF_LIGHTS * (PIXELS*NO_OF_GAPS));
-    lights[i].r = r;
-    lights[i].rMax = r;
-    lights[i].rMin = r;
-    lights[i].g = g;
-    lights[i].gMax = g;
-    lights[i].gMin = g;
-    lights[i].b = b;
-    lights[i].bMax = b;
-    lights[i].bMin = b;
-    lights[i].lightState = lightStateSteady;
-  }
+	byte i;
+	for (i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		lights[i].pos = (int)((float)i / NO_OF_LIGHTS * (PIXELS*NO_OF_GAPS));
+		lights[i].r = r;
+		lights[i].rMax = r;
+		lights[i].rMin = r;
+		lights[i].g = g;
+		lights[i].gMax = g;
+		lights[i].gMin = g;
+		lights[i].b = b;
+		lights[i].bMax = b;
+		lights[i].bMin = b;
+		lights[i].lightState = lightStateSteady;
+	}
 }
 
 void setAllLilac()
 {
-  setLightColor(220, 208, 255);
+	setLightColor(220, 208, 255);
 }
 
 void randomiseLight(byte lightNo)
 {
-  lights[lightNo].pos = (int)((float)lightNo / NO_OF_LIGHTS * (PIXELS*NO_OF_GAPS));
+	lights[lightNo].pos = (int)((float)lightNo / NO_OF_LIGHTS * (PIXELS*NO_OF_GAPS));
 
-  lights[lightNo].r = (byte)random(0, 256);
-  lights[lightNo].rMax = (byte)random(lights[lightNo].r, 256);
-  lights[lightNo].rMin = (byte)random(0, lights[lightNo].r);
+	lights[lightNo].r = (byte)random(0, 256);
+	lights[lightNo].rMax = (byte)random(lights[lightNo].r, 256);
+	lights[lightNo].rMin = (byte)random(0, lights[lightNo].r);
 
-  lights[lightNo].g = (byte)random(0, 256);
-  lights[lightNo].gMax = (byte)random(lights[lightNo].g, 256);
-  lights[lightNo].gMin = (byte)random(0, lights[lightNo].g);
+	lights[lightNo].g = (byte)random(0, 256);
+	lights[lightNo].gMax = (byte)random(lights[lightNo].g, 256);
+	lights[lightNo].gMin = (byte)random(0, lights[lightNo].g);
 
-  lights[lightNo].b = (byte)random(0, 256);
-  lights[lightNo].bMax = (byte)random(lights[lightNo].b, 256);
-  lights[lightNo].bMin = (byte)random(0, lights[lightNo].b);
+	lights[lightNo].b = (byte)random(0, 256);
+	lights[lightNo].bMax = (byte)random(lights[lightNo].b, 256);
+	lights[lightNo].bMin = (byte)random(0, lights[lightNo].b);
 
-  lights[lightNo].rUpdate = (int8_t)random(-3, 4);
-  lights[lightNo].gUpdate = (int8_t)random(-3, 4);
-  lights[lightNo].bUpdate = (int8_t)random(-3, 4);
+	lights[lightNo].rUpdate = (int8_t)random(-3, 4);
+	lights[lightNo].gUpdate = (int8_t)random(-3, 4);
+	lights[lightNo].bUpdate = (int8_t)random(-3, 4);
 
-  lights[lightNo].colourSpeed = (byte)random(100, 256);
+	lights[lightNo].colourSpeed = (byte)random(100, 256);
 
-  lights[lightNo].moveDist = (int8_t)random(-3, 4);
-  lights[lightNo].moveSpeed = (byte)random(1, 100);
-  lights[lightNo].posMax = (int)random(0, PIXELS*NO_OF_GAPS);
-  lights[lightNo].posMin = (int)random(0, lights[lightNo].posMax);
-  lights[lightNo].lightState = lightStateColourBounce;
+	lights[lightNo].moveDist = (int8_t)random(-3, 4);
+	lights[lightNo].moveSpeed = (byte)random(1, 100);
+	lights[lightNo].posMax = (int)random(0, PIXELS*NO_OF_GAPS);
+	lights[lightNo].posMin = (int)random(0, lights[lightNo].posMax);
+	lights[lightNo].lightState = lightStateColourBounce;
 }
 
 void randomiseLights()
 {
-  byte i;
-  for (i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    randomiseLight(i);
-  }
-  // force an update if we go into candle mode later
-  resetOldFlickerValues();
-  forceLightUpdate = true;
+	byte i;
+	for (i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		randomiseLight(i);
+	}
+	// force an update if we go into candle mode later
+	resetOldFlickerValues();
+	forceLightUpdate = true;
 }
 
 void setAllLightsOff()
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    lights[i].lightState = lightStateOff;
-  }
-  // force an update if we go into candle mode later
-  resetOldFlickerValues();
-  forceLightUpdate = true;
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		lights[i].lightState = lightStateOff;
+	}
+	// force an update if we go into candle mode later
+	resetOldFlickerValues();
+	forceLightUpdate = true;
 }
 
 void startLights()
 {
 #ifdef SERIAL_VERBOSE
-  Serial.println(".Starting lights");
+	Serial.println(".Starting lights");
 #endif  
-  // Turn on flickering
-  flickerActive = true;
-  // Turn off force update
-  forceLightUpdate = false;
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
-  setAllLightsOff();
-  strip.show();
+	// Turn on flickering
+	flickerActive = true;
+	// Turn off force update
+	forceLightUpdate = false;
+	strip.begin();
+	strip.show(); // Initialize all pixels to 'off'
+	setAllLightsOff();
+	strip.show();
 }
 
 void do_lightsOff()
 {
 #ifdef SERIAL_VERBOSE
-  Serial.println("Lights Off command");
+	Serial.println("Lights Off command");
 #endif  
-  setAllLightsOff();
+	setAllLightsOff();
 }
 
 void copyBlock(byte * dest, byte * src, int length)
 {
-  for (int i = 0; i < length; i++)
-  {
-    *dest = *src;
-    dest++;
-    src++;
-  }
+	for (int i = 0; i < length; i++)
+	{
+		*dest = *src;
+		dest++;
+		src++;
+	}
 }
 
 void renderLight(int lightNo)
 {
-  if (lights[lightNo].lightState == lightStateOff) return;
+	if (lights[lightNo].lightState == lightStateOff) return;
 
-  int pos = lights[lightNo].pos;
-  byte firstLight = pos / NO_OF_GAPS;
-  byte secondLight = firstLight + 1;
-  if (secondLight == PIXELS) secondLight = 0;
-  byte positionInGap = pos % NO_OF_GAPS;
-  float secondFactor = (float)positionInGap / NO_OF_GAPS;
-  float firstFactor = 1 - secondFactor;
-  float flickerFactor = (float)lights[lightNo].flickerBrightness / 255;
-  float brightnessFactor = (float)lightBrightness / 255;
+	int pos = lights[lightNo].pos;
+	byte firstLight = pos / NO_OF_GAPS;
+	byte secondLight = firstLight + 1;
+	if (secondLight == PIXELS) secondLight = 0;
+	byte positionInGap = pos % NO_OF_GAPS;
+	float secondFactor = (float)positionInGap / NO_OF_GAPS;
+	float firstFactor = 1 - secondFactor;
+	float flickerFactor = (float)lights[lightNo].flickerBrightness / 255;
+	float brightnessFactor = (float)lightBrightness / 255;
 
 #ifdef DISPLAY_LIGHT_SETTINGS
-  Serial.print("Rendering Light ");
-  Serial.println(lightNo);
-  Serial.print("Colour: ");
-  Serial.print(lights[lightNo].r);
-  Serial.print(" ");
-  Serial.print(lights[lightNo].g);
-  Serial.print(" ");
-  Serial.println(lights[lightNo].b);
-  Serial.print("firstLight:  ");
-  Serial.println(firstLight);
-  Serial.print("secondLight:  ");
-  Serial.println(secondLight);
-  Serial.print("Position:  ");
-  Serial.println(lights[lightNo].pos);
-  Serial.print("positionInGap:  ");
-  Serial.println(positionInGap);
-  Serial.print("secondFactor:  ");
-  Serial.println(secondFactor);
-  Serial.print("firstFactor:  ");
-  Serial.println(firstFactor);
-  Serial.print("flickerFactor:  ");
-  Serial.println(flickerFactor);
-  byte rv = lights[lightNo].r*firstFactor*flickerFactor*brightnessFactor;
-  Serial.print("First factor: ");
-  Serial.print(firstFactor);
-  Serial.print("Flicker factor: ");
-  Serial.print(flickerFactor);
-  Serial.print("Brightness factor: ");
-  Serial.print(brightnessFactor);
-  Serial.print("Brightness: ");
-  Serial.println(rv);
-  //delay(2000);
+	Serial.print("Rendering Light ");
+	Serial.println(lightNo);
+	Serial.print("Colour: ");
+	Serial.print(lights[lightNo].r);
+	Serial.print(" ");
+	Serial.print(lights[lightNo].g);
+	Serial.print(" ");
+	Serial.println(lights[lightNo].b);
+	Serial.print("firstLight:  ");
+	Serial.println(firstLight);
+	Serial.print("secondLight:  ");
+	Serial.println(secondLight);
+	Serial.print("Position:  ");
+	Serial.println(lights[lightNo].pos);
+	Serial.print("positionInGap:  ");
+	Serial.println(positionInGap);
+	Serial.print("secondFactor:  ");
+	Serial.println(secondFactor);
+	Serial.print("firstFactor:  ");
+	Serial.println(firstFactor);
+	Serial.print("flickerFactor:  ");
+	Serial.println(flickerFactor);
+	byte rv = lights[lightNo].r*firstFactor*flickerFactor*brightnessFactor;
+	Serial.print("First factor: ");
+	Serial.print(firstFactor);
+	Serial.print("Flicker factor: ");
+	Serial.print(flickerFactor);
+	Serial.print("Brightness factor: ");
+	Serial.print(brightnessFactor);
+	Serial.print("Brightness: ");
+	Serial.println(rv);
+	//delay(2000);
 
 #endif 
 
-  strip.setPixelColor(firstLight,
-    (byte)(lights[lightNo].r*firstFactor*flickerFactor*brightnessFactor),
-    (byte)(lights[lightNo].g*firstFactor*flickerFactor*brightnessFactor),
-    (byte)(lights[lightNo].b*firstFactor*flickerFactor*brightnessFactor));
+	strip.setPixelColor(firstLight,
+		(byte)(lights[lightNo].r*firstFactor*flickerFactor*brightnessFactor),
+		(byte)(lights[lightNo].g*firstFactor*flickerFactor*brightnessFactor),
+		(byte)(lights[lightNo].b*firstFactor*flickerFactor*brightnessFactor));
 
-  if (positionInGap != 0) {
-    strip.setPixelColor(secondLight,
-      (byte)(lights[lightNo].r*secondFactor*brightnessFactor),
-      (byte)(lights[lightNo].g*secondFactor*brightnessFactor),
-      (byte)(lights[lightNo].b*secondFactor*brightnessFactor));
-  }
+	if (positionInGap != 0) {
+		strip.setPixelColor(secondLight,
+			(byte)(lights[lightNo].r*secondFactor*brightnessFactor),
+			(byte)(lights[lightNo].g*secondFactor*brightnessFactor),
+			(byte)(lights[lightNo].b*secondFactor*brightnessFactor));
+	}
 }
 
 void steadyLight(int position, struct Light * l)
 {
-  (*l).pos = position;
-  (*l).moveSpeed = 0;
-  (*l).rUpdate = 0;
-  (*l).gUpdate = 0;
-  (*l).bUpdate = 0;
-  (*l).colourSpeed = 0;
-  (*l).flickerSpeed = 0;
-  (*l).flickerBrightness = 255;
-  (*l).lightState = lightStateSteady;
+	(*l).pos = position;
+	(*l).moveSpeed = 0;
+	(*l).rUpdate = 0;
+	(*l).gUpdate = 0;
+	(*l).bUpdate = 0;
+	(*l).colourSpeed = 0;
+	(*l).flickerSpeed = 0;
+	(*l).flickerBrightness = 255;
+	(*l).lightState = lightStateSteady;
 }
 
 void colouredSteadyLight(byte r, byte g, byte b, int position, struct Light * l)
 {
-  (*l).r = r;
-  (*l).g = g;
-  (*l).b = b;
-  steadyLight(position, l);
+	(*l).r = r;
+	(*l).g = g;
+	(*l).b = b;
+	steadyLight(position, l);
 }
 
 void setLightColor(byte r, byte g, byte b, byte lightNo)
 {
-  colouredSteadyLight(r, g, b, lightNo*NO_OF_GAPS, &lights[lightNo]);
-  forceLightUpdate = true;
+	colouredSteadyLight(r, g, b, lightNo*NO_OF_GAPS, &lights[lightNo]);
+	forceLightUpdate = true;
 }
 
 void flickeringLight(byte flickerBrightness, byte flickerUpdate, byte flickerMin, byte flickerMax, byte flickerSpeed, int position, struct Light * l)
 {
-  (*l).flickerBrightness = flickerBrightness;
-  (*l).flickerUpdate = flickerUpdate;
-  (*l).flickerMin = flickerMin;
-  (*l).flickerMax = flickerMax;
-  (*l).flickerSpeed = flickerSpeed;
-  (*l).pos = position;
-  (*l).moveSpeed = 0;
-  (*l).rUpdate = 0;
-  (*l).gUpdate = 0;
-  (*l).bUpdate = 0;
-  (*l).colourSpeed = 0;
-  (*l).lightState = lightStateFlickerFixed;
+	(*l).flickerBrightness = flickerBrightness;
+	(*l).flickerUpdate = flickerUpdate;
+	(*l).flickerMin = flickerMin;
+	(*l).flickerMax = flickerMax;
+	(*l).flickerSpeed = flickerSpeed;
+	(*l).pos = position;
+	(*l).moveSpeed = 0;
+	(*l).rUpdate = 0;
+	(*l).gUpdate = 0;
+	(*l).bUpdate = 0;
+	(*l).colourSpeed = 0;
+	(*l).lightState = lightStateFlickerFixed;
 }
 
 void colouredFlickeringLight(byte r, byte g, byte b, byte flickerBrightness, byte flickerUpdate, byte flickerMin, byte flickerMax, byte flickerSpeed, int position, struct Light * l)
 {
-  (*l).r = r;
-  (*l).g = g;
-  (*l).b = b;
-  flickeringLight(flickerBrightness, flickerUpdate, flickerMin, flickerMax, flickerSpeed, position, l);
+	(*l).r = r;
+	(*l).g = g;
+	(*l).b = b;
+	flickeringLight(flickerBrightness, flickerUpdate, flickerMin, flickerMax, flickerSpeed, position, l);
 }
 
 void flickerOn()
 {
-  flickerActive = true;
+	flickerActive = true;
 }
 
 void flickerOff()
 {
-  flickerActive = false;
+	flickerActive = false;
 }
 
 void renderLights()
 {
-  for (uint16_t i = 0; i < strip.numPixels(); i++) {
-    strip.setPixelColor(i, 0, 0, 0);
-  }
+	for (uint16_t i = 0; i < strip.numPixels(); i++) {
+		strip.setPixelColor(i, 0, 0, 0);
+	}
 
-  for (int i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    renderLight(i);
-  }
+	for (int i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		renderLight(i);
+	}
 
-  if (forceLightUpdate)
-  {
-    strip.show();
-    forceLightUpdate = false;
-  }
+	if (forceLightUpdate)
+	{
+		strip.show();
+		forceLightUpdate = false;
+	}
 
-  if (flickerActive )
-  {
-    strip.show();
-  }
+	if (flickerActive)
+	{
+		strip.show();
+	}
 }
 
 void updateLightColours(byte i)
 {
-  if ((tickCount % lights[i].colourSpeed) != 0 || lights[i].colourSpeed == 0)
-    return;
+	if (lights[i].colourSpeed == 0)
+		return;
 
-  /// going to 'bounce' the colours when they hit the endstops
-  int temp;
+	if ((tickCount % lights[i].colourSpeed) != 0)
+		return;
 
-  //if(i==0){
+	/// going to 'bounce' the colours when they hit the endstops
+	int temp;
 
-  //  Serial.print("r"); Serial.println(lights[i].r);
-  //  Serial.print("rUpdate"); Serial.println(lights[i].rUpdate);
-  //  Serial.print("rMax"); Serial.println(lights[i].rMax);
-  //  Serial.print("rMin"); Serial.println(lights[i].rMin);
-  //  delay(2000);
-  //}
+	//if(i==0){
 
-  if (lights[i].rUpdate != 0)
-  {
-    // calculate the update value - use an int becuase we need negative and > 255
-    temp = lights[i].r;
-    temp += lights[i].rUpdate;
+	//  Serial.print("r"); Serial.println(lights[i].r);
+	//  Serial.print("rUpdate"); Serial.println(lights[i].rUpdate);
+	//  Serial.print("rMax"); Serial.println(lights[i].rMax);
+	//  Serial.print("rMin"); Serial.println(lights[i].rMin);
+	//  delay(2000);
+	//}
 
-    if (lights[i].rMax == lights[i].rMin)
-    {
-      // doing a transition
-      if (lights[i].rUpdate < 0)
-      {
-        // heading down towards the limit
-        if (temp <= lights[i].rMin)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].r = lights[i].rMin;
-          // stop any further updates
-          lights[i].rUpdate = 0;
-        }
-        else {
-          lights[i].r = temp;
-        }
-      }
-      else
-      {
-        // heading up towards the limit
-        if (temp >= lights[i].rMax)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].r = lights[i].rMax;
-          // stop any further updates
-          lights[i].rUpdate = 0;
-        }
-        else {
-          lights[i].r = temp;
-        }
-      }
-    }
-    else
-    {
-      // performing a normal animation 
-      // reverse the direction when the limits are reached
-      if (temp <= lights[i].rMin)
-      {
-        lights[i].r = lights[i].rMin;
-        lights[i].rUpdate = -lights[i].rUpdate;
-      }
-      else {
-        if (temp >= lights[i].rMax)
-        {
-          lights[i].r = lights[i].rMax;
-          lights[i].rUpdate = -lights[i].rUpdate;
-        }
-      }
-    }
-  }
+	if (lights[i].rUpdate != 0)
+	{
+		// calculate the update value - use an int becuase we need negative and > 255
+		temp = lights[i].r;
+		temp += lights[i].rUpdate;
 
-  if (lights[i].gUpdate != 0)
-  {
-    // calculate the update value - use an int becuase we need negative and > 255
-    temp = lights[i].g;
-    temp += lights[i].gUpdate;
+		if (lights[i].rMax == lights[i].rMin)
+		{
+			// doing a transition
+			if (lights[i].rUpdate < 0)
+			{
+				// heading down towards the limit
+				if (temp <= lights[i].rMin)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].r = lights[i].rMin;
+					// stop any further updates
+					lights[i].rUpdate = 0;
+				}
+				else {
+					lights[i].r = temp;
+				}
+			}
+			else
+			{
+				// heading up towards the limit
+				if (temp >= lights[i].rMax)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].r = lights[i].rMax;
+					// stop any further updates
+					lights[i].rUpdate = 0;
+				}
+				else {
+					lights[i].r = temp;
+				}
+			}
+		}
+		else
+		{
+			// performing a normal animation 
+			// reverse the direction when the limits are reached
+			if (temp <= lights[i].rMin)
+			{
+				lights[i].r = lights[i].rMin;
+				lights[i].rUpdate = -lights[i].rUpdate;
+			}
+			else {
+				if (temp >= lights[i].rMax)
+				{
+					lights[i].r = lights[i].rMax;
+					lights[i].rUpdate = -lights[i].rUpdate;
+				}
+			}
+		}
+	}
 
-    if (lights[i].gMax == lights[i].gMin)
-    {
-      // doing a transition
-      if (lights[i].gUpdate < 0)
-      {
-        // heading down towards the limit
-        if (temp <= lights[i].gMin)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].g = lights[i].gMin;
-          // stop any further updates
-          lights[i].gUpdate = 0;
-        }
-        else {
-          lights[i].g = temp;
-        }
-      }
-      else
-      {
-        // heading up towards the limit
-        if (temp >= lights[i].gMax)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].g = lights[i].gMax;
-          // stop any further updates
-          lights[i].gUpdate = 0;
-        }
-        else {
-          lights[i].g = temp;
-        }
-      }
-    }
-    else
-    {
-      // performing a normal animation 
-      // reverse the direction when the limits are reached
-      if (temp <= lights[i].gMin)
-      {
-        lights[i].g = lights[i].gMin;
-        lights[i].gUpdate = -lights[i].gUpdate;
-      }
-      else {
-        if (temp >= lights[i].gMax)
-        {
-          lights[i].g = lights[i].gMax;
-          lights[i].gUpdate = -lights[i].gUpdate;
-        }
-      }
-    }
-  }
+	if (lights[i].gUpdate != 0)
+	{
+		// calculate the update value - use an int becuase we need negative and > 255
+		temp = lights[i].g;
+		temp += lights[i].gUpdate;
 
-  if (lights[i].bUpdate != 0)
-  {
-    // calculate the update value - use an int becuase we need negative and > 255
-    temp = lights[i].b;
-    temp += lights[i].bUpdate;
+		if (lights[i].gMax == lights[i].gMin)
+		{
+			// doing a transition
+			if (lights[i].gUpdate < 0)
+			{
+				// heading down towards the limit
+				if (temp <= lights[i].gMin)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].g = lights[i].gMin;
+					// stop any further updates
+					lights[i].gUpdate = 0;
+				}
+				else {
+					lights[i].g = temp;
+				}
+			}
+			else
+			{
+				// heading up towards the limit
+				if (temp >= lights[i].gMax)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].g = lights[i].gMax;
+					// stop any further updates
+					lights[i].gUpdate = 0;
+				}
+				else {
+					lights[i].g = temp;
+				}
+			}
+		}
+		else
+		{
+			// performing a normal animation 
+			// reverse the direction when the limits are reached
+			if (temp <= lights[i].gMin)
+			{
+				lights[i].g = lights[i].gMin;
+				lights[i].gUpdate = -lights[i].gUpdate;
+			}
+			else {
+				if (temp >= lights[i].gMax)
+				{
+					lights[i].g = lights[i].gMax;
+					lights[i].gUpdate = -lights[i].gUpdate;
+				}
+			}
+		}
+	}
 
-    if (lights[i].bMax == lights[i].bMin)
-    {
-      // doing a transition
-      if (lights[i].bUpdate < 0)
-      {
-        // heading down towards the limit
-        if (temp <= lights[i].bMin)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].b = lights[i].bMin;
-          // stop any further updates
-          lights[i].bUpdate = 0;
-        }
-        else {
-          lights[i].b = temp;
-        }
-      }
-      else
-      {
-        // heading up towards the limit
-        if (temp >= lights[i].bMax)
-        {
-          // hit the end condition
-          // clamp the value
-          lights[i].b = lights[i].bMax;
-          // stop any further updates
-          lights[i].bUpdate = 0;
-        }
-        else {
-          lights[i].b = temp;
-        }
-      }
-    }
-    else
-    {
-      // performing a normal animation 
-      // reverse the direction when the limits are reached
-      if (temp <= lights[i].bMin)
-      {
-        lights[i].b = lights[i].bMin;
-        lights[i].bUpdate = -lights[i].bUpdate;
-      }
-      else {
-        if (temp >= lights[i].bMax)
-        {
-          lights[i].b = lights[i].bMax;
-          lights[i].bUpdate = -lights[i].bUpdate;
-        }
-      }
-    }
-  }
+	if (lights[i].bUpdate != 0)
+	{
+		// calculate the update value - use an int becuase we need negative and > 255
+		temp = lights[i].b;
+		temp += lights[i].bUpdate;
+
+		if (lights[i].bMax == lights[i].bMin)
+		{
+			// doing a transition
+			if (lights[i].bUpdate < 0)
+			{
+				// heading down towards the limit
+				if (temp <= lights[i].bMin)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].b = lights[i].bMin;
+					// stop any further updates
+					lights[i].bUpdate = 0;
+				}
+				else {
+					lights[i].b = temp;
+				}
+			}
+			else
+			{
+				// heading up towards the limit
+				if (temp >= lights[i].bMax)
+				{
+					// hit the end condition
+					// clamp the value
+					lights[i].b = lights[i].bMax;
+					// stop any further updates
+					lights[i].bUpdate = 0;
+				}
+				else {
+					lights[i].b = temp;
+				}
+			}
+		}
+		else
+		{
+			// performing a normal animation 
+			// reverse the direction when the limits are reached
+			if (temp <= lights[i].bMin)
+			{
+				lights[i].b = lights[i].bMin;
+				lights[i].bUpdate = -lights[i].bUpdate;
+			}
+			else {
+				if (temp >= lights[i].bMax)
+				{
+					lights[i].b = lights[i].bMax;
+					lights[i].bUpdate = -lights[i].bUpdate;
+				}
+			}
+		}
+	}
 }
 
 bool transitionComplete()
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    if (lights[i].rUpdate != 0 || lights[i].gUpdate != 0 || lights[i].bUpdate != 0)
-      return 0;
-  }
-  return 1;
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		if (lights[i].rUpdate != 0 || lights[i].gUpdate != 0 || lights[i].bUpdate != 0)
+			return 0;
+	}
+	return 1;
 }
 
 void updateLightPosition(byte i)
 {
-  if ((tickCount % lights[i].moveSpeed) != 0 || lights[i].moveSpeed == 0)
-    return;
+	if (lights[i].moveSpeed == 0)
+		return;
 
-  lights[i].pos += lights[i].moveSpeed;
+	if ((tickCount % lights[i].moveSpeed) != 0)
+		return;
 
-  if (lights[i].pos >= PIXELS*NO_OF_GAPS)
-  {
-    lights[i].pos -= (PIXELS*NO_OF_GAPS);
-  }
-  else {
-    if (lights[i].pos < 0)
-    {
-      lights[i].pos += (PIXELS*NO_OF_GAPS);
-    }
-  }
+	lights[i].pos += lights[i].moveSpeed;
+
+	if (lights[i].pos >= PIXELS * NO_OF_GAPS)
+	{
+		lights[i].pos -= (PIXELS*NO_OF_GAPS);
+	}
+	else {
+		if (lights[i].pos < 0)
+		{
+			lights[i].pos += (PIXELS*NO_OF_GAPS);
+		}
+	}
 }
 
 int flickerUpdateSpeed = 8;
 
 void setFlickerUpdateSpeed(byte speed)
 {
-  // clamp the value
-  if (speed > 20)
-    speed = 20;
-  if (speed < 1)
-    speed = 1;
+	// clamp the value
+	if (speed > 20)
+		speed = 20;
+	if (speed < 1)
+		speed = 1;
 
-  // set the new flicker update speed
-  flickerUpdateSpeed = 21 - speed;
+	// set the new flicker update speed
+	flickerUpdateSpeed = 21 - speed;
 
 }
 
 void updateLightFlicker(byte i)
 {
-  if (lights[i].flickerSpeed == 0)
-    return;
+	if (lights[i].flickerSpeed == 0)
+		return;
 
-  if (lights[i].flickerUpdate == 0) 
-    return; // quit if not flickering
+	if (lights[i].flickerUpdate == 0)
+		return; // quit if not flickering
 
-  if ((tickCount % lights[i].flickerSpeed) != 0)
-    return;
+	if ((tickCount % lights[i].flickerSpeed) != 0)
+		return;
 
-  /// going to 'bounce' the flicker when it hits the endstops
-  int temp = lights[i].flickerBrightness;
+	/// going to 'bounce' the flicker when it hits the endstops
+	int temp = lights[i].flickerBrightness;
 
-  temp += lights[i].flickerUpdate;
+	temp += lights[i].flickerUpdate;
 
-  if (temp <= lights[i].flickerMin)
-  { 
-    // clamp the value at the lower limit
-    lights[i].flickerBrightness = lights[i].flickerMin;
+	if (temp <= lights[i].flickerMin)
+	{
+		// clamp the value at the lower limit
+		lights[i].flickerBrightness = lights[i].flickerMin;
 
-    // reverse direction
-    lights[i].flickerUpdate = -lights[i].flickerUpdate;
+		// reverse direction
+		lights[i].flickerUpdate = -lights[i].flickerUpdate;
 
-    // The faster the flicker rate, the more likely a change
-    if (random(0, flickerUpdateSpeed/2) < 2)
-    {
-      // change the flicker speed
-      lights[i].flickerUpdate = random(1, (int)(lights[i].flickerMax - lights[i].flickerMin) / flickerUpdateSpeed);
-    }
-  }
-  else {
-    if (temp >= lights[i].flickerMax)
-    {
-      // just clamp and reverse
-      lights[i].flickerBrightness = lights[i].flickerMax;
-      lights[i].flickerUpdate = -lights[i].flickerUpdate;
-    }
-    else
-    {
-      lights[i].flickerBrightness = (byte)temp;
-    }
-  }
+		// The faster the flicker rate, the more likely a change
+		if (random(0, flickerUpdateSpeed / 2) < 2)
+		{
+			// change the flicker speed
+			lights[i].flickerUpdate = random(1, (int)(lights[i].flickerMax - lights[i].flickerMin) / flickerUpdateSpeed);
+		}
+	}
+	else {
+		if (temp >= lights[i].flickerMax)
+		{
+			// just clamp and reverse
+			lights[i].flickerBrightness = lights[i].flickerMax;
+			lights[i].flickerUpdate = -lights[i].flickerUpdate;
+		}
+		else
+		{
+			lights[i].flickerBrightness = (byte)temp;
+		}
+	}
 }
 
 // Start the transition of a light to a new colour
@@ -614,58 +620,58 @@ void updateLightFlicker(byte i)
 void startLightTransition(byte lightNo, byte speed, byte colourSpeed, byte r, byte g, byte b)
 {
 
-  colouredFlickeringLight(
-    lights[lightNo].r, lights[lightNo].g, lights[lightNo].b,     // colour
-    random(1, lights[lightNo].flickerMax - lights[lightNo].flickerMin),//60,            // flicker brightness
-    random(1, (int)(lights[lightNo].flickerMax - lights[lightNo].flickerMin) / flickerUpdateSpeed),            // flicker update step
-    lights[lightNo].flickerMin,            // flicker minimum
-    lights[lightNo].flickerMax,           // flicker maximum
-    1,             // number of ticks per flicker update - flicker speed
-    NO_OF_GAPS*lightNo,  // position on the ring
-    &lights[lightNo]);   // ligit to make flicker
+	colouredFlickeringLight(
+		lights[lightNo].r, lights[lightNo].g, lights[lightNo].b,     // colour
+		random(1, lights[lightNo].flickerMax - lights[lightNo].flickerMin),//60,            // flicker brightness
+		random(1, (int)(lights[lightNo].flickerMax - lights[lightNo].flickerMin) / flickerUpdateSpeed),            // flicker update step
+		lights[lightNo].flickerMin,            // flicker minimum
+		lights[lightNo].flickerMax,           // flicker maximum
+		1,             // number of ticks per flicker update - flicker speed
+		NO_OF_GAPS*lightNo,  // position on the ring
+		&lights[lightNo]);   // ligit to make flicker
 
-  lights[lightNo].colourSpeed = colourSpeed;
-  lights[lightNo].rMin = r;
-  lights[lightNo].rMax = r;
+	lights[lightNo].colourSpeed = colourSpeed;
+	lights[lightNo].rMin = r;
+	lights[lightNo].rMax = r;
 
-  if (lights[lightNo].r > r)
-  {
-    lights[lightNo].rUpdate = (int8_t)-((lights[lightNo].r - r) / speed);
-    if (lights[lightNo].rUpdate == 0) lights[lightNo].rUpdate = -1;
-  }
-  else
-  {
-    lights[lightNo].rUpdate = (int8_t)((r - lights[lightNo].r) / speed);
-    if (lights[lightNo].rUpdate == 0) lights[lightNo].rUpdate = 1;
-  }
+	if (lights[lightNo].r > r)
+	{
+		lights[lightNo].rUpdate = (int8_t)-((lights[lightNo].r - r) / speed);
+		if (lights[lightNo].rUpdate == 0) lights[lightNo].rUpdate = -1;
+	}
+	else
+	{
+		lights[lightNo].rUpdate = (int8_t)((r - lights[lightNo].r) / speed);
+		if (lights[lightNo].rUpdate == 0) lights[lightNo].rUpdate = 1;
+	}
 
-  lights[lightNo].gMin = g;
-  lights[lightNo].gMax = g;
+	lights[lightNo].gMin = g;
+	lights[lightNo].gMax = g;
 
-  if (lights[lightNo].g > g)
-  {
-    lights[lightNo].gUpdate = (int8_t)-((lights[lightNo].g - g) / speed);
-    if (lights[lightNo].gUpdate == 0) lights[lightNo].gUpdate = -1;
-  }
-  else
-  {
-    lights[lightNo].gUpdate = (int8_t)((g - lights[lightNo].g) / speed);
-    if (lights[lightNo].gUpdate == 0) lights[lightNo].gUpdate = 1;
-  }
+	if (lights[lightNo].g > g)
+	{
+		lights[lightNo].gUpdate = (int8_t)-((lights[lightNo].g - g) / speed);
+		if (lights[lightNo].gUpdate == 0) lights[lightNo].gUpdate = -1;
+	}
+	else
+	{
+		lights[lightNo].gUpdate = (int8_t)((g - lights[lightNo].g) / speed);
+		if (lights[lightNo].gUpdate == 0) lights[lightNo].gUpdate = 1;
+	}
 
-  lights[lightNo].bMin = b;
-  lights[lightNo].bMax = b;
+	lights[lightNo].bMin = b;
+	lights[lightNo].bMax = b;
 
-  if (lights[lightNo].b > b)
-  {
-    lights[lightNo].bUpdate = (int8_t)-((lights[lightNo].b - b) / speed);
-    if (lights[lightNo].bUpdate == 0) lights[lightNo].bUpdate = -1;
-  }
-  else
-  {
-    lights[lightNo].bUpdate = (int8_t)((b - lights[lightNo].b) / speed);
-    if (lights[lightNo].bUpdate == 0) lights[lightNo].bUpdate = 1;
-  }
+	if (lights[lightNo].b > b)
+	{
+		lights[lightNo].bUpdate = (int8_t)-((lights[lightNo].b - b) / speed);
+		if (lights[lightNo].bUpdate == 0) lights[lightNo].bUpdate = -1;
+	}
+	else
+	{
+		lights[lightNo].bUpdate = (int8_t)((b - lights[lightNo].b) / speed);
+		if (lights[lightNo].bUpdate == 0) lights[lightNo].bUpdate = 1;
+	}
 }
 
 /* Colour Codes
@@ -815,342 +821,342 @@ Yellow-Green,154,205,50,#9acd32,
 
 enum lightColor
 {
-  red,
-  blue,
-  green,
-  lilac,
-  cyan,
-  pink,
-  lavender,
-  plum,
-  lime,
-  orange,
-  powder_blue,
-  purple,
-  teal
+	red,
+	blue,
+	green,
+	lilac,
+	cyan,
+	pink,
+	lavender,
+	plum,
+	lime,
+	orange,
+	powder_blue,
+	purple,
+	teal
 };
 
 void selectColour(lightColor color, byte *r, byte *g, byte *b)
 {
-  switch (color)
-  {
-  case red: // red
+	switch (color)
+	{
+	case red: // red
 #ifdef SERIAL_VERBOSE
-    Serial.println("Red");
+		Serial.println("Red");
 #endif
-    (*r) = 255; (*g) = 0; (*b) = 0;
-    break;
-  case blue: // blue
+		(*r) = 255; (*g) = 0; (*b) = 0;
+		break;
+	case blue: // blue
 #ifdef SERIAL_VERBOSE
-    Serial.println("Blue");
+		Serial.println("Blue");
 #endif
-    (*r) = 0; (*g) = 0; (*b) = 255;
-    break;
-  case green: // green
+		(*r) = 0; (*g) = 0; (*b) = 255;
+		break;
+	case green: // green
 #ifdef SERIAL_VERBOSE
-    Serial.println("Green");
+		Serial.println("Green");
 #endif
-    (*r) = 0; (*g) = 255; (*b) = 0;
-    break;
-  case lilac: // lilac
+		(*r) = 0; (*g) = 255; (*b) = 0;
+		break;
+	case lilac: // lilac
 #ifdef SERIAL_VERBOSE
-    Serial.println("Lilac");
+		Serial.println("Lilac");
 #endif
-    (*r) = 220; (*g) = 208; (*b) = 255;
-    break;
-  case cyan: // cyan
+		(*r) = 220; (*g) = 208; (*b) = 255;
+		break;
+	case cyan: // cyan
 #ifdef SERIAL_VERBOSE
-    Serial.println("cyan");
+		Serial.println("cyan");
 #endif
-    (*r) = 0; (*g) = 255; (*b) = 255;
-    break;
-  case pink: // hot pink
+		(*r) = 0; (*g) = 255; (*b) = 255;
+		break;
+	case pink: // hot pink
 #ifdef SERIAL_VERBOSE
-    Serial.println("hot pink");
+		Serial.println("hot pink");
 #endif
-    (*r) = 255; (*g) = 105; (*b) = 180;
-    break;
-  case lavender: // lavender
+		(*r) = 255; (*g) = 105; (*b) = 180;
+		break;
+	case lavender: // lavender
 #ifdef SERIAL_VERBOSE
-    Serial.println("lavender");
+		Serial.println("lavender");
 #endif
-    (*r) = 230; (*g) = 230; (*b) = 250;
-    break;
-  case plum: // plum
+		(*r) = 230; (*g) = 230; (*b) = 250;
+		break;
+	case plum: // plum
 #ifdef SERIAL_VERBOSE
-    Serial.println("plum");
+		Serial.println("plum");
 #endif
-    (*r) = 221; (*g) = 160; (*b) = 221;
-    break;
-  case lime: // lime
+		(*r) = 221; (*g) = 160; (*b) = 221;
+		break;
+	case lime: // lime
 #ifdef SERIAL_VERBOSE
-    Serial.println("lime");
+		Serial.println("lime");
 #endif
-    (*r) = 50; (*g) = 205; (*b) = 50;
-    break;
-  case orange: // orange
+		(*r) = 50; (*g) = 205; (*b) = 50;
+		break;
+	case orange: // orange
 #ifdef SERIAL_VERBOSE
-    Serial.println("orange");
+		Serial.println("orange");
 #endif
-    (*r) = 255; (*g) = 165; (*b) = 0;
-    break;
-  case powder_blue: // powder blue
+		(*r) = 255; (*g) = 165; (*b) = 0;
+		break;
+	case powder_blue: // powder blue
 #ifdef SERIAL_VERBOSE
-    Serial.println("powder blue");
+		Serial.println("powder blue");
 #endif
-    (*r) = 176; (*g) = 244; (*b) = 230;
-    break;
-  case purple: // purple
+		(*r) = 176; (*g) = 244; (*b) = 230;
+		break;
+	case purple: // purple
 #ifdef SERIAL_VERBOSE
-    Serial.println("purple");
+		Serial.println("purple");
 #endif
-    (*r) = 128; (*g) = 0; (*b) = 128;
-    break;
-  case teal: // teal
+		(*r) = 128; (*g) = 0; (*b) = 128;
+		break;
+	case teal: // teal
 #ifdef SERIAL_VERBOSE
-    Serial.println("teal");
+		Serial.println("teal");
 #endif
-    (*r) = 0; (*g) = 128; (*b) = 128;
-    break;
-  }
+		(*r) = 0; (*g) = 128; (*b) = 128;
+		break;
+	}
 }
 
 void pickRandomColour(byte *r, byte *g, byte *b)
 {
-  switch (random(0, 13))
-  {
-  case 0: // red
+	switch (random(0, 13))
+	{
+	case 0: // red
 #ifdef SERIAL_VERBOSE
-    Serial.println("Red");
+		Serial.println("Red");
 #endif
-    (*r) = 255; (*g) = 0; (*b) = 0;
-    break;
-  case 1: // blue
+		(*r) = 255; (*g) = 0; (*b) = 0;
+		break;
+	case 1: // blue
 #ifdef SERIAL_VERBOSE
-    Serial.println("Blue");
+		Serial.println("Blue");
 #endif
-    (*r) = 0; (*g) = 0; (*b) = 255;
-    break;
-  case 2: // green
+		(*r) = 0; (*g) = 0; (*b) = 255;
+		break;
+	case 2: // green
 #ifdef SERIAL_VERBOSE
-    Serial.println("Green");
+		Serial.println("Green");
 #endif
-    (*r) = 0; (*g) = 255; (*b) = 0;
-    break;
-  case 3: // lilac
+		(*r) = 0; (*g) = 255; (*b) = 0;
+		break;
+	case 3: // lilac
 #ifdef SERIAL_VERBOSE
-    Serial.println("Lilac");
+		Serial.println("Lilac");
 #endif
-    (*r) = 220; (*g) = 208; (*b) = 255;
-    break;
-  case 4: // cyan
+		(*r) = 220; (*g) = 208; (*b) = 255;
+		break;
+	case 4: // cyan
 #ifdef SERIAL_VERBOSE
-    Serial.println("cyan");
+		Serial.println("cyan");
 #endif
-    (*r) = 0; (*g) = 255; (*b) = 255;
-    break;
-  case 5: // hot pink
+		(*r) = 0; (*g) = 255; (*b) = 255;
+		break;
+	case 5: // hot pink
 #ifdef SERIAL_VERBOSE
-    Serial.println("hot pink");
+		Serial.println("hot pink");
 #endif
-    (*r) = 255; (*g) = 105; (*b) = 180;
-    break;
-  case 6: // lavender
+		(*r) = 255; (*g) = 105; (*b) = 180;
+		break;
+	case 6: // lavender
 #ifdef SERIAL_VERBOSE
-    Serial.println("lavender");
+		Serial.println("lavender");
 #endif
-    (*r) = 230; (*g) = 230; (*b) = 250;
-    break;
-  case 7: // plum
+		(*r) = 230; (*g) = 230; (*b) = 250;
+		break;
+	case 7: // plum
 #ifdef SERIAL_VERBOSE
-    Serial.println("plum");
+		Serial.println("plum");
 #endif
-    (*r) = 221; (*g) = 160; (*b) = 221;
-    break;
-  case 8: // lime
+		(*r) = 221; (*g) = 160; (*b) = 221;
+		break;
+	case 8: // lime
 #ifdef SERIAL_VERBOSE
-    Serial.println("lime");
+		Serial.println("lime");
 #endif
-    (*r) = 50; (*g) = 205; (*b) = 50;
-    break;
-  case 9: // orange
+		(*r) = 50; (*g) = 205; (*b) = 50;
+		break;
+	case 9: // orange
 #ifdef SERIAL_VERBOSE
-    Serial.println("orange");
+		Serial.println("orange");
 #endif
-    (*r) = 255; (*g) = 165; (*b) = 0;
-    break;
-  case 10: // powder blue
+		(*r) = 255; (*g) = 165; (*b) = 0;
+		break;
+	case 10: // powder blue
 #ifdef SERIAL_VERBOSE
-    Serial.println("powder blue");
+		Serial.println("powder blue");
 #endif
-    (*r) = 176; (*g) = 244; (*b) = 230;
-    break;
-  case 11: // purple
+		(*r) = 176; (*g) = 244; (*b) = 230;
+		break;
+	case 11: // purple
 #ifdef SERIAL_VERBOSE
-    Serial.println("purple");
+		Serial.println("purple");
 #endif
-    (*r) = 128; (*g) = 0; (*b) = 128;
-    break;
-  case 12: // teal
+		(*r) = 128; (*g) = 0; (*b) = 128;
+		break;
+	case 12: // teal
 #ifdef SERIAL_VERBOSE
-    Serial.println("teal");
+		Serial.println("teal");
 #endif
-    (*r) = 0; (*g) = 128; (*b) = 128;
-    break;
-  }
+		(*r) = 0; (*g) = 128; (*b) = 128;
+		break;
+	}
 }
 
 
 void transitionToColor(byte speed, byte r, byte g, byte b)
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-    startLightTransition(i, 50, speed, r, g, b);
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+		startLightTransition(i, 50, speed, r, g, b);
 }
 
 void transitionToRandomColor()
 {
-  byte r, g, b;
+	byte r, g, b;
 
-  pickRandomColour(&r, &g, &b);
+	pickRandomColour(&r, &g, &b);
 
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-    startLightTransition(i, 50, 20, r, g, b);
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+		startLightTransition(i, 50, 20, r, g, b);
 }
 
 void flickeringColouredLights(byte r, byte g, byte b, byte min, byte max)
 {
-  if (r == oldr & g == oldg & b == oldb)
-  {
-    return;
-  }
+	if (r == oldr & g == oldg & b == oldb)
+	{
+		return;
+	}
 
-  for (byte i = 0; i < NO_OF_LIGHTS; i++) {
-    colouredFlickeringLight(
-      r, g, b,     // colour
-      random(1, max - min),//60,            // flicker brightness
-      random(1, (int)(max - min) / flickerUpdateSpeed),            // flicker update step
-      min,            // flicker minimum
-      max,           // flicker maximum
-      1,             // number of ticks per flicker update - flicker speed
-      NO_OF_GAPS*i,  // position on the ring
-      &lights[i]);   // ligit to make flicker
-  }
-  oldr = r;
-  oldb = b;
-  oldg = g;
-  forceLightUpdate = true;
+	for (byte i = 0; i < NO_OF_LIGHTS; i++) {
+		colouredFlickeringLight(
+			r, g, b,     // colour
+			random(1, max - min),//60,            // flicker brightness
+			random(1, (int)(max - min) / flickerUpdateSpeed),            // flicker update step
+			min,            // flicker minimum
+			max,           // flicker maximum
+			1,             // number of ticks per flicker update - flicker speed
+			NO_OF_GAPS*i,  // position on the ring
+			&lights[i]);   // ligit to make flicker
+	}
+	oldr = r;
+	oldb = b;
+	oldg = g;
+	forceLightUpdate = true;
 }
 
 
 
 void flickeringColouredLights(lightColor color, byte min, byte max)
 {
-  byte r, g, b;
-  selectColour(color, &r, &g, &b);
-  flickeringColouredLights(r, g, b, min, max);
+	byte r, g, b;
+	selectColour(color, &r, &g, &b);
+	flickeringColouredLights(r, g, b, min, max);
 }
 
 void do_set_fade_colour(byte * buffer)
 {
 #ifdef SERIAL_VERBOSE
-  Serial.print("Got Fade Colour r:");
-  Serial.print(buffer[0]);
-  Serial.print(" g:");
-  Serial.print(buffer[1]);
-  Serial.print(" b:");
-  Serial.print(buffer[2]);
-  Serial.print(" ticks per update:");
-  Serial.print(buffer[3]);
-  Serial.print(" no of steps to colour:");
-  Serial.print(buffer[4]);
+	Serial.print("Got Fade Colour r:");
+	Serial.print(buffer[0]);
+	Serial.print(" g:");
+	Serial.print(buffer[1]);
+	Serial.print(" b:");
+	Serial.print(buffer[2]);
+	Serial.print(" ticks per update:");
+	Serial.print(buffer[3]);
+	Serial.print(" no of steps to colour:");
+	Serial.print(buffer[4]);
 #endif 
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-    startLightTransition(i, buffer[3], buffer[4], buffer[0], buffer[1], buffer[2]);
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+		startLightTransition(i, buffer[3], buffer[4], buffer[0], buffer[1], buffer[2]);
 }
 
 void do_set_brightness(byte * buffer)
 {
 #ifdef SERIAL_VERBOSE
-  Serial.print("Got brightness:");
-  Serial.println(buffer[0]);
+	Serial.print("Got brightness:");
+	Serial.println(buffer[0]);
 #endif
 
-  lightBrightness = buffer[0];
+	lightBrightness = buffer[0];
 }
 
 void do_set_flickering_colour(byte * buffer)
 {
 #ifdef SERIAL_VERBOSE
-  Serial.print("Send Flickering Colour r:");
-  Serial.print(buffer[0]);
-  Serial.print(" g:");
-  Serial.print(buffer[1]);
-  Serial.print(" b:");
-  Serial.println(buffer[2]);
+	Serial.print("Send Flickering Colour r:");
+	Serial.print(buffer[0]);
+	Serial.print(" g:");
+	Serial.print(buffer[1]);
+	Serial.print(" b:");
+	Serial.println(buffer[2]);
 #endif 
-  flickeringColouredLights(buffer[0], buffer[1], buffer[2], 0, 255);
+	flickeringColouredLights(buffer[0], buffer[1], buffer[2], 0, 255);
 }
 
 void do_start_flickering()
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++) {
-    flickeringLight(
-      60,            // flicker brightness
-      20,            // flicker update step
-      0,            // flicker minimum
-      255,           // flicker maximum
-      1,             // number of ticks per flicker update
-      lights[i].pos,  // position on the ring
-      &lights[i]);   // ligit to make flicker
-  }
+	for (byte i = 0; i < NO_OF_LIGHTS; i++) {
+		flickeringLight(
+			60,            // flicker brightness
+			20,            // flicker update step
+			0,            // flicker minimum
+			255,           // flicker maximum
+			1,             // number of ticks per flicker update
+			lights[i].pos,  // position on the ring
+			&lights[i]);   // ligit to make flicker
+	}
 }
 
 void do_stop_flickering()
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++) {
-    steadyLight(
-      lights[i].pos,  // position on the ring
-      &lights[i]);   // ligit to make steady
-  }
+	for (byte i = 0; i < NO_OF_LIGHTS; i++) {
+		steadyLight(
+			lights[i].pos,  // position on the ring
+			&lights[i]);   // ligit to make steady
+	}
 }
 
 void do_start_sparkle()
 {
-  randomiseLights();
+	randomiseLights();
 }
 
 void updateLights()
 {
-  for (byte i = 0; i < NO_OF_LIGHTS; i++)
-  {
-    updateLightColours(i);
-    updateLightPosition(i);
-    updateLightFlicker(i);
-  }
+	for (byte i = 0; i < NO_OF_LIGHTS; i++)
+	{
+		updateLightColours(i);
+		updateLightPosition(i);
+		updateLightFlicker(i);
+	}
 
-  renderLights();
+	renderLights();
 }
 
 void updateLightsAndDelay(bool wantDelay)
 {
-  tickEnd = millis() + TICK_INTERVAL;
+	tickEnd = millis() + TICK_INTERVAL;
 
-  tickCount++;
+	tickCount++;
 
-  updateLights();
+	updateLights();
 
-  if (transitionComplete())
-  {
-    if(randomColourTransitions)
-      transitionToRandomColor();
-  }
+	if (transitionComplete())
+	{
+		if (randomColourTransitions)
+			transitionToRandomColor();
+	}
 
-  if (wantDelay)
-  {
-    while (millis() < tickEnd) {
-      delay(1);
-    }
-  }
+	if (wantDelay)
+	{
+		while (millis() < tickEnd) {
+			delay(1);
+		}
+	}
 }
 
 // Pixel position for busy display
@@ -1160,44 +1166,44 @@ byte busyRed, busyGreen, busyBlue;
 void updateBusyPixel()
 {
 
-  // turn off the current pixel dot
-  setLightColor(0, 0, 0, pixelPos);
+	// turn off the current pixel dot
+	setLightColor(0, 0, 0, pixelPos);
 
-  pixelPos++;
+	pixelPos++;
 
-  if (pixelPos == PIXELS)
-    pixelPos = 0;
+	if (pixelPos == PIXELS)
+		pixelPos = 0;
 
-  setLightColor(busyRed, busyGreen, busyBlue, pixelPos);
+	setLightColor(busyRed, busyGreen, busyBlue, pixelPos);
 
-  updateLights();
+	updateLights();
 }
 
 void startBusyPixel(byte red, byte green, byte blue)
 {
-  busyRed = red;
-  busyBlue = blue;
-  busyGreen = green;
-  setAllLightsOff();
-  pixelPos = 0;
-  updateBusyPixel();
+	busyRed = red;
+	busyBlue = blue;
+	busyGreen = green;
+	setAllLightsOff();
+	pixelPos = 0;
+	updateBusyPixel();
 }
 
 void stopBusyPixel()
 {
-  setAllLightsOff();
-  oldr = 0;
-  oldg = 0; 
-  oldb = 0;
+	setAllLightsOff();
+	oldr = 0;
+	oldg = 0;
+	oldb = 0;
 }
 
 void displayBusyPixelWait(int ticks, int onTime, byte red, byte green, byte blue)
 {
-  startBusyPixel(red, green, blue);
-  for (int i = 0; i < ticks; i++)
-  {
-    updateBusyPixel();
-    delay(onTime);
-  }
-  stopBusyPixel();
+	startBusyPixel(red, green, blue);
+	for (int i = 0; i < ticks; i++)
+	{
+		updateBusyPixel();
+		delay(onTime);
+	}
+	stopBusyPixel();
 }

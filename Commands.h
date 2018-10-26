@@ -1205,7 +1205,7 @@ bool readColour(byte *r, byte *g, byte*b)
 
 	if (!getValue(&result))
 	{
-		return;
+		return false;
 	}
 
 	*r = (byte)result;
@@ -1248,7 +1248,7 @@ bool readColour(byte *r, byte *g, byte*b)
 
 	if (!getValue(&result))
 	{
-		return;
+		return false;
 	}
 
 	*g = (byte)result;
@@ -1277,7 +1277,7 @@ bool readColour(byte *r, byte *g, byte*b)
 
 	if (!getValue(&result))
 	{
-		return;
+		return false;
 	}
 
 	*b = (byte)result;
@@ -2557,8 +2557,6 @@ void remoteManagement()
 		break;
 	}
 }
-
-const String version = "Version R1.1";
 
 // IV - information display version
 

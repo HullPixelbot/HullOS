@@ -4,6 +4,9 @@
 // Command protocol available at https://github.com/HullPixelbot/HullPixelbotCode
 // Version 1.5 Rob Miles
 
+
+const String version = "HullOS Version R1.2";
+
 // Physical connections for Arduino Pro Mini
 
 
@@ -59,7 +62,6 @@ void setup() {
   //
   //testDistanceSensor();
 
-  Serial.println(F("HULLOS starting"));
   setupMotors();
   setupDistanceSensor(25);
   setupSound();
@@ -76,7 +78,8 @@ void setup() {
 }
 
 
-void loop() {
+void loop() 
+{
   updateRobot();
   updateDistanceSensor();
   updateLightsAndDelay(!commandsNeedFullSpeed());
