@@ -54,7 +54,7 @@ const String version = "HullOS Version R1.2";
 void setup() {
 
   Serial.begin(1200);
-  Serial.println(version);
+//  Serial.println(version);
 
   // Uncomment to test the distance sensor
   // Repeatedly sends readings while moving the robot to test

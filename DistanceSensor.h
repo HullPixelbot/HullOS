@@ -132,7 +132,6 @@ float getDistanceValueFloat()
   return (float)pulseWidth / 5.80;
 }
 
-
 void directDistanceReadTest()
 {
   pinMode(trigPin, OUTPUT);
