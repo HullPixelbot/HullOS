@@ -30,6 +30,17 @@ volatile unsigned long rightTimeOfLastStep;
 volatile unsigned long leftTimeOfNextStep;
 volatile unsigned long rightTimeOfNextStep;
 
+int PORTA;
+int PORTB;
+int PORTC;
+int PORTD;
+
+int DDRA;
+int DDRB;
+int DDRC;
+int DDRD;
+
+
 inline void leftStep()
 {
   // If we are not moving, don't do anything
@@ -710,4 +721,3 @@ int timedMoveArcRobot(float radius, float angle, float timeToMoveInSeconds)
     return timedMoveDistanceInMM(rightDistanceToMove, leftDistanceToMove, timeToMoveInSeconds);
   }
 }
-

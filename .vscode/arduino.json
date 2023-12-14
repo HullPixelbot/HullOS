@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "port": "COM6",
+    "sketch": "HullOS.ino",
+    "programmer": "AVRISP mkII"
+}

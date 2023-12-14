@@ -2,10 +2,10 @@
 // Accepts commands via the serial port and acts on them to control motor movement
 // and pixel colours. 
 // Command protocol available at https://github.com/HullPixelbot/HullPixelbotCode
-// Version 1.5 Rob Miles
+// Version 1.3 Rob Miles
 
 
-const String version = "HullOS Version R1.2";
+const String version = "HullOS Version R1.3";
 
 // Physical connections for Arduino Pro Mini
 
@@ -69,7 +69,7 @@ void setup() {
   setupVariables();
   startLights();
   
-  displayBusyPixelWait(5, 200, 255, 0, 255);
+//  displayBusyPixelWait(8, 200, 0, 255, 0);
 
   // Uncomment to test the script engine
   //testScript();
