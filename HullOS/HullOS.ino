@@ -2,10 +2,10 @@
 // Accepts commands via the serial port and acts on them to control motor movement
 // and pixel colours. 
 // Command protocol available at https://github.com/HullPixelbot/HullPixelbotCode
-// Version 1.3 Rob Miles
+// Version 1.5 Rob Miles
 
 
-const String version = "HullOS Version R1.3";
+const String version = "HullOS Version R2.0";
 
 // Physical connections for Arduino Pro Mini
 
@@ -51,10 +51,11 @@ const String version = "HullOS Version R1.3";
 
 #include "Script.h"
 
-void setup() {
+// starts silently and is ready to run as soon as possible
+//
 
+void setup() {
   Serial.begin(1200);
-//  Serial.println(version);
 
   // Uncomment to test the distance sensor
   // Repeatedly sends readings while moving the robot to test
@@ -68,9 +69,6 @@ void setup() {
   setupRemoteControl();
   setupVariables();
   startLights();
-  
-//  displayBusyPixelWait(8, 200, 0, 255, 0);
-
   // Uncomment to test the script engine
   //testScript();
 
